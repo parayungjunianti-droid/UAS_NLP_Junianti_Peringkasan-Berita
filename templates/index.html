@@ -1,0 +1,211 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - Sistem Peringkasan Berita Bahasa Indonesia{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div id="notification-container" class="mb-3"></div>
+
+    <section class="hero-section">
+        <div class="badge-saas mb-3">
+            <i class="bi bi-stars"></i> Abstractive Text Summarization Engine
+        </div>
+        <h1 class="hero-title">Sistem <span>Peringkasan Berita</span></h1>
+        <p class="hero-subtitle">Menghasilkan ringkasan otomatis menggunakan Transformer Abstraktif untuk menyarikan poin penting berita Bahasa Indonesia secara presisi.</p>
+    </section>
+
+    <div class="row justify-content-center mb-5">
+        <div class="col-lg-10">
+            <div class="saas-card position-relative">
+                <div id="loading-overlay" class="loading-overlay">
+                    <div class="spinner-saas mb-3"></div>
+                    <h5 class="fw-bold text-dark mb-1">Memproses Ringkasan Berita...</h5>
+                    <p class="text-muted small">Menggunakan Model Transformer Transformer Abstraktif Hugging Face</p>
+                </div>
+
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-pencil-square fs-4 text-warning"></i>
+                        <h4 class="fw-bold mb-0">Input Berita Bahasa Indonesia</h4>
+                    </div>
+                    <span class="badge bg-light text-dark border">Bahasa Indonesia</span>
+                </div>
+
+                <form id="news-form">
+                    <div class="mb-4">
+                        <textarea id="news-input" class="form-control form-control-saas" placeholder="Tempelkan atau ketik artikel berita Bahasa Indonesia di sini (minimal 50 karakter)..."></textarea>
+                    </div>
+
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+                        <div class="d-flex flex-wrap gap-2">
+                            <button type="button" id="btn-sample" class="btn btn-secondary-saas">
+                                <i class="bi bi-file-earmark-text"></i> Contoh Berita
+                            </button>
+                            <button type="button" id="btn-clear" class="btn btn-outline-saas">
+                                <i class="bi bi-trash"></i> Bersihkan
+                            </button>
+                        </div>
+                        <button type="submit" id="btn-summarize" class="btn btn-primary-saas fs-6">
+                            <i class="bi bi-lightning-charge-fill"></i> Ringkas Berita
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="result-card" class="row justify-content-center mb-5 result-section">
+        <div class="col-lg-10">
+            <div class="saas-card mb-4 border-warning">
+                <div class="d-flex flex-wrap align-items-center justify-content-between border-bottom pb-3 mb-4 gap-2">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-check-circle-fill fs-3 text-warning"></i>
+                        <div>
+                            <h4 class="fw-bold mb-0">Hasil Ringkasan Berita</h4>
+                            <small class="text-muted">Dihasilkan secara otomatis oleh Transformer Abstraktif</small>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-wrap gap-2">
+                        <button id="btn-copy" class="btn btn-secondary-saas btn-sm">
+                            <i class="bi bi-clipboard"></i> Copy Ringkasan
+                        </button>
+                        <button id="btn-download-txt" class="btn btn-outline-saas btn-sm">
+                            <i class="bi bi-file-earmark-arrow-down"></i> Download TXT
+                        </button>
+                        <button id="btn-download-pdf" class="btn btn-primary-saas btn-sm">
+                            <i class="bi bi-file-earmark-pdf"></i> Download PDF
+                        </button>
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <div class="metric-card">
+                            <div id="res-compression" class="metric-value">0%</div>
+                            <div class="metric-label">Persentase Kompresi</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="metric-card">
+                            <div id="res-inference-time" class="metric-value">0s</div>
+                            <div class="metric-label">Waktu Inferensi</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="metric-card">
+                            <div id="res-original-word" class="metric-value">0</div>
+                            <div class="metric-label">Jumlah Kata Asli</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <h5 class="fw-bold text-dark mb-2">Ringkasan Berita:</h5>
+                    <div class="p-3 bg-light rounded-4 border border-warning border-2">
+                        <p id="res-summary-text" class="lead text-dark mb-0 fw-semibold"></p>
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <div class="stat-pill">
+                            <span class="stat-pill-label"><i class="bi bi-type"></i> Jumlah Karakter Asli</span>
+                            <span id="res-original-char" class="stat-pill-value">0 Karakter</span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="stat-pill">
+                            <span class="stat-pill-label"><i class="bi bi-cpu"></i> Model yang digunakan</span>
+                            <span id="res-model-used" class="stat-pill-value">csebuetnlp/mT5_multilingual_XLSum</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion accordion-flush" id="accordionPreprocessing">
+                    <div class="accordion-item border-0 bg-transparent">
+                        <h2 class="accordion-header" id="headingOne">
+                            <button class="accordion-button collapsed rounded-4 bg-light fw-bold text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePrep" aria-expanded="false" aria-controls="collapsePrep">
+                                <i class="bi bi-gear-wide-connected me-2 text-warning"></i> Detail Tahapan Preprocessing Teks
+                            </button>
+                        </h2>
+                        <div id="collapsePrep" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionPreprocessing">
+                            <div class="accordion-body pt-3 px-0">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="p-3 bg-white rounded-3 border">
+                                            <h6 class="fw-bold text-dark">Case Folding</h6>
+                                            <p id="prep-case-folding" class="small text-muted font-monospace mb-0 text-truncate"></p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="p-3 bg-white rounded-3 border">
+                                            <h6 class="fw-bold text-dark">Jumlah Token</h6>
+                                            <p id="prep-total-tokens" class="h5 fw-bold text-warning mb-0">0 Token</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="p-3 bg-white rounded-3 border">
+                                            <h6 class="fw-bold text-dark">Panjang Kalimat</h6>
+                                            <p id="prep-sentence-count" class="h5 fw-bold text-warning mb-0">0 Kalimat</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="p-3 bg-white rounded-3 border">
+                                            <h6 class="fw-bold text-dark mb-2">Tokenisasi Sample</h6>
+                                            <div id="prep-tokens-list"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4 pt-3 border-top">
+                    <h6 class="fw-bold text-dark mb-2">Berita Asli:</h6>
+                    <p id="res-original-text" class="text-muted small mb-0"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section id="cara-kerja" class="py-5">
+        <div class="text-center mb-5">
+            <span class="badge-saas mb-2"><i class="bi bi-diagram-3"></i> Workflow Process</span>
+            <h2 class="fw-bold text-dark">Cara Kerja Sistem Peringkas</h2>
+            <p class="text-muted">Tahapan pemrosesan teks berita menggunakan arsitektur Transformer Abstraktif</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-3">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <h5 class="fw-bold">Input Berita</h5>
+                    <p class="text-muted small mb-0">Artikel berita dimasukkan melalui form textarea interaktif.</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <h5 class="fw-bold">Preprocessing Teks</h5>
+                    <p class="text-muted small mb-0">Teks dibersihkan melalui case folding, normalisasi spasi, dan tokenisasi.</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <h5 class="fw-bold">Inferensi Transformer</h5>
+                    <p class="text-muted small mb-0">Model Transformer (mT5/BART) memproses representasi semantik teks.</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="step-card">
+                    <div class="step-number">4</div>
+                    <h5 class="fw-bold">Generasi Ringkasan</h5>
+                    <p class="text-muted small mb-0">Sistem menghasilkan kalimat ringkasan baru berbasis makna abstraktif.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

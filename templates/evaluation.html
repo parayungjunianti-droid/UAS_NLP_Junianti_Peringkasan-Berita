@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+
+{% block title %}Evaluasi Model - Sistem Peringkasan Berita Bahasa Indonesia{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <span class="badge-saas mb-2"><i class="bi bi-bar-chart-line"></i> Model Performance Benchmark</span>
+        <h1 class="fw-bold text-dark">Evaluasi Metrik NLP</h1>
+        <p class="text-muted">Pengujian performa model Transformer Abstraktif menggunakan metrik ROUGE dan BLEU Score
+            pada Dataset Berita Bahasa Indonesia.</p>
+    </div>
+
+    <div class="row g-4 mb-5">
+        <div class="col-md-4 col-lg-2">
+            <div class="metric-card">
+                <div class="metric-value">{{ eval_data.metrics.rouge_1 }}%</div>
+                <div class="metric-label">ROUGE-1</div>
+            </div>
+        </div>
+        <div class="col-md-4 col-lg-2">
+            <div class="metric-card">
+                <div class="metric-value">{{ eval_data.metrics.rouge_2 }}%</div>
+                <div class="metric-label">ROUGE-2</div>
+            </div>
+        </div>
+        <div class="col-md-4 col-lg-2">
+            <div class="metric-card">
+                <div class="metric-value">{{ eval_data.metrics.rouge_l }}%</div>
+                <div class="metric-label">ROUGE-L</div>
+            </div>
+        </div>
+        <div class="col-md-4 col-lg-2">
+            <div class="metric-card">
+                <div class="metric-value">{{ eval_data.metrics.bleu }}%</div>
+                <div class="metric-label">BLEU Score</div>
+            </div>
+        </div>
+        <div class="col-md-4 col-lg-2">
+            <div class="metric-card">
+                <div class="metric-value">{{ eval_data.metrics.avg_inference_time }}s</div>
+                <div class="metric-label">Inference Time</div>
+            </div>
+        </div>
+        <div class="col-md-4 col-lg-2">
+            <div class="metric-card">
+                <div class="metric-value">{{ eval_data.metrics.avg_summary_length }}</div>
+                <div class="metric-label">Panjang Ringkasan</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-5">
+        <div class="col-lg-8 mb-4 mb-lg-0">
+            <div class="saas-card">
+                <div class="d-flex align-items-center justify-content-between mb-4">
+                    <h5 class="fw-bold mb-0"><i class="bi bi-graph-up text-warning me-2"></i> Grafik Visualisasi Metrik
+                        Evaluasi</h5>
+                    <span class="badge bg-light text-dark border">Perbandingan ROUGE & BLEU</span>
+                </div>
+                <div style="position: relative; height:320px;">
+                    <canvas id="metricsChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="saas-card">
+                <h5 class="fw-bold mb-3"><i class="bi bi-info-circle text-warning me-2"></i> Penjelasan Metrik</h5>
+                <div class="mb-3">
+                    <h6 class="fw-bold text-dark mb-1">ROUGE-1 / ROUGE-2</h6>
+                    <p class="text-muted small mb-0">Mengukur overlap unigram dan bigram antara ringkasan hasil generasi
+                        model dengan ringkasan acuan (reference summary).</p>
+                </div>
+                <div class="mb-3">
+                    <h6 class="fw-bold text-dark mb-1">ROUGE-L</h6>
+                    <p class="text-muted small mb-0">Mengukur Longest Common Subsequence (LCS) untuk menilai koherensi
+                        struktur urutan kata.</p>
+                </div>
+                <div>
+                    <h6 class="fw-bold text-dark mb-1">BLEU Score</h6>
+                    <p class="text-muted small mb-0">Mengukur presisi n-gram dari generasi teks dengan penalti untuk
+                        ringkasan yang terlalu pendek.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="saas-card">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <h5 class="fw-bold mb-0"><i class="bi bi-table text-warning me-2"></i> Detail Pengujian Sampel Dataset</h5>
+            <span class="badge bg-warning text-dark fw-bold">{{ eval_data.dataset_results|length }} Sampel Berita</span>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Judul Berita</th>
+                        <th>Ringkasan Acuan (Reference)</th>
+                        <th>Ringkasan Generasi Model</th>
+                        <th>ROUGE-1</th>
+                        <th>BLEU</th>
+                        <th>Waktu (s)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in eval_data.dataset_results %}
+                    <tr>
+                        <td class="fw-bold">{{ item.id }}</td>
+                        <td class="fw-semibold text-dark">{{ item.title }}</td>
+                        <td class="small text-muted" style="max-width: 250px;">{{ item.reference_summary }}</td>
+                        <td class="small fw-semibold text-dark" style="max-width: 280px;">{{ item.generated_summary }}
+                        </td>
+                        <td><span class="badge bg-warning text-dark">{{ item.rouge_1 }}%</span></td>
+                        <td><span class="badge bg-light text-dark border">{{ item.bleu }}%</span></td>
+                        <td class="small text-muted">{{ item.inference_time }}s</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const canvas = document.getElementById('metricsChart');
+        if (!canvas) return;
+
+        const rouge1 = parseFloat(canvas.dataset.rouge1) || 0;
+        const rouge2 = parseFloat(canvas.dataset.rouge2) || 0;
+        const rougeL = parseFloat(canvas.dataset.rougel) || 0;
+        const bleu = parseFloat(canvas.dataset.bleu) || 0;
+
+        const ctx = canvas.getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['ROUGE-1', 'ROUGE-2', 'ROUGE-L', 'BLEU Score'],
+                datasets: [{
+                    label: 'Skor Evaluasi (%)',
+                    data: [rouge1, rouge2, rougeL, bleu],
+                    backgroundColor: [
+                        '#FFD54F',
+                        '#FBC02D',
+                        '#F59E0B',
+                        '#D97706'
+                    ],
+                    borderRadius: 12,
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        grid: {
+                            color: '#F1F5F9'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

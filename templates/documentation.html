@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block title %}Dokumentasi - Sistem Peringkasan Berita Bahasa Indonesia{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <span class="badge-saas mb-2"><i class="bi bi-book"></i> Comprehensive Guide</span>
+        <h1 class="fw-bold text-dark">Dokumentasi Proyek</h1>
+        <p class="text-muted">Panduan teknis dan pemahaman teoritis mengenai Sistem Peringkasan Berita Bahasa Indonesia Abstraktif.</p>
+    </div>
+
+    <div class="row g-4 mb-5">
+        <div class="col-lg-4">
+            <div class="saas-card sticky-top" style="top: 100px;">
+                <h5 class="fw-bold mb-3"><i class="bi bi-list-nested text-warning me-2"></i> Daftar Isi</h5>
+                <div class="list-group list-group-flush">
+                    <a href="#pengertian" class="list-group-item list-group-item-action border-0 px-0 fw-semibold text-dark">1. Pengertian Text Summarization</a>
+                    <a href="#metode" class="list-group-item list-group-item-action border-0 px-0 fw-semibold text-dark">2. Metode Abstraktif</a>
+                    <a href="#transformer" class="list-group-item list-group-item-action border-0 px-0 fw-semibold text-dark">3. Cara Kerja Transformer</a>
+                    <a href="#preprocessing" class="list-group-item list-group-item-action border-0 px-0 fw-semibold text-dark">4. Tahapan Preprocessing</a>
+                    <a href="#dataset" class="list-group-item list-group-item-action border-0 px-0 fw-semibold text-dark">5. Dataset yang Digunakan</a>
+                    <a href="#running" class="list-group-item list-group-item-action border-0 px-0 fw-semibold text-dark">6. Cara Menjalankan Aplikasi</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div id="pengertian" class="saas-card mb-4">
+                <h3 class="fw-bold text-dark mb-3"><i class="bi bi-file-earmark-text text-warning me-2"></i> 1. Pengertian Text Summarization</h3>
+                <p>Text Summarization (Peringkasan Teks) adalah salah satu cabang utama dalam Natural Language Processing (NLP) yang bertujuan untuk mereduksi dokumen teks panjang menjadi ringkasan yang lebih singkat tanpa menghilangkan substansi dan informasi utama dokumen asli.</p>
+                <p class="mb-0">Peringkasan otomatis sangat krusial dalam domain berita digital untuk membantu pembaca memahami poin penting secara cepat dan efisien di tengah melimpahnya informasi (information overload).</p>
+            </div>
+
+            <div id="metode" class="saas-card mb-4">
+                <h3 class="fw-bold text-dark mb-3"><i class="bi bi-diagram-2 text-warning me-2"></i> 2. Metode Abstraktif</h3>
+                <p>Pendekatan peringkasan teks terbagi menjadi dua kategori utama:</p>
+                <ul>
+                    <li class="mb-2"><strong>Extractive Summarization:</strong> Mengambil kalimat-kalimat utuh secara langsung dari teks sumber berdasarkan bobot statistik tanpa mengubah susunan kata.</li>
+                    <li class="mb-2"><strong>Abstractive Summarization:</strong> Memahami konteks semantik teks sumber dan merumuskan kalimat-kalimat baru yang tidak secara verbatim muncul di dokumen asli. Metode ini meniru cara berpikir manusia dalam merangkum.</li>
+                </ul>
+                <p class="mb-0">Aplikasi ini memanfaatkan metode <strong>Abstractive Summarization</strong> sehingga dapat menghasilkan ringkasan yang lebih alami, fleksibel, dan koheren.</p>
+            </div>
+
+            <div id="transformer" class="saas-card mb-4">
+                <h3 class="fw-bold text-dark mb-3"><i class="bi bi-cpu text-warning me-2"></i> 3. Cara Kerja Transformer</h3>
+                <p>Arsitektur Transformer berbasis mekanika <em>Self-Attention Mechanism</em> memungkinkan model memproses hubungan antar kata secara eksplisit dalam urutan paralel.</p>
+                <p>Model sequence-to-sequence seperti <strong>mT5 (Multilingual T5)</strong> dan <strong>BART</strong> dilatih menggunakan mekanisme Encoder-Decoder:</p>
+                <ul>
+                    <li><strong>Encoder:</strong> Memetakan urutan token berita Bahasa Indonesia ke dalam ruang vektor konteks tersembunyi (hidden representation).</li>
+                    <li><strong>Decoder:</strong> Menggenerasi token demi token ringkasan baru secara terarah berdasarkan representasi dari Encoder.</li>
+                </ul>
+            </div>
+
+            <div id="preprocessing" class="saas-card mb-4">
+                <h3 class="fw-bold text-dark mb-3"><i class="bi bi-sliders text-warning me-2"></i> 4. Tahapan Preprocessing</h3>
+                <p>Sebelum dimasukkan ke dalam model Transformer, teks berita melalui tahapan pembersihan:</p>
+                <ol>
+                    <li class="mb-2"><strong>Case Folding:</strong> Mengubah seluruh huruf menjadi huruf kecil (lowercase).</li>
+                    <li class="mb-2"><strong>Normalisasi Whitespace:</strong> Menghapus karakter spasi berlebih, newline, dan tabulasi.</li>
+                    <li class="mb-2"><strong>Pembersihan Karakter:</strong> Menghapus simbol khusus yang tidak relevan.</li>
+                    <li class="mb-2"><strong>Tokenisasi Subword:</strong> Memecah kata menjadi unit subword/token untuk dimasukkan ke dalam model.</li>
+                </ol>
+            </div>
+
+            <div id="dataset" class="saas-card mb-4">
+                <h3 class="fw-bold text-dark mb-3"><i class="bi bi-database text-warning me-2"></i> 5. Dataset yang Digunakan</h3>
+                <p>Sistem ini dievaluasi menggunakan dataset berita Bahasa Indonesia yang tersimpan pada berkas <code>dataset/news_dataset.csv</code>. Dataset mencakup artikel berbagai bidang seperti teknologi, ekonomi, infrastruktur, dan lingkungan hidup beserta ringkasan acuan manusia (human reference summary).</p>
+            </div>
+
+            <div id="running" class="saas-card">
+                <h3 class="fw-bold text-dark mb-3"><i class="bi bi-terminal text-warning me-2"></i> 6. Cara Menjalankan Aplikasi</h3>
+                <p>Ikuti langkah berikut untuk menjalankan aplikasi secara lokal:</p>
+                <div class="bg-dark text-light p-3 rounded-3 font-monospace mb-3">
+                    # 1. Install dependensi<br>
+                    pip install -r requirements.txt<br><br>
+                    # 2. Jalankan server Flask<br>
+                    python app.py
+                </div>
+                <p class="mb-0">Akses aplikasi melalui peramban web di alamat <code>http://localhost:5000</code>.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
